@@ -18,7 +18,7 @@ type Profile = {
 type AboutSectionProps = {
     action: 'SAVE' | 'EDIT';
     onActionChange: () => void;
-    token?: string; // Accept token for API requests
+    token?: string; 
 };
 
 const AboutSection: React.FC<AboutSectionProps> = ({ action, onActionChange, token }) => {
