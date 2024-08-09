@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from "react";
-import Input from "./components/Input";
 import { useRouter } from 'next/navigation';
-import BackButton from "../components/Button/BackButton";
+import Input from "./components/Input"; // Pastikan jalur ini benar
+import BackButton from "../components/Button/BackButton"; // Pastikan jalur ini benar
 
 const AuthPage = () => {
   const [variant, setVariant] = useState('LOGIN'); 
@@ -17,32 +17,31 @@ const AuthPage = () => {
 
   return (
     <div className="relative flex items-center justify-center min-h-screen flex-col gap-4 bg-custom-radial-gradient">
-        
-        <div className='absolute top-4 left-4'>
-        <BackButton />
-        </div>
+      <div className='absolute top-4 left-4'>
+        <BackButton href="/" />
+      </div>
       <h1 className='text-lg'>{variant}</h1>
       {isLogin ? (
         <>
-          <Input placeholder="enter username/email" type="text" />
-          <Input placeholder="enter your password" type="password" />
+          <Input placeholder="enter username/email" type="text" key="login-username" />
+          <Input placeholder="enter your password" type="password" key="login-password" />
         </>
       ) : (
         <>
-          <Input placeholder="enter email" type="text" />
-          <Input placeholder="enter username" type="text" />
-          <Input placeholder="enter password" type="password" />
-          <Input placeholder="confirm password" type="password" />
+          <Input placeholder="enter email" type="text" key="register-email" />
+          <Input placeholder="enter username" type="text" key="register-username" />
+          <Input placeholder="enter password" type="password" key="register-password" />
+          <Input placeholder="confirm password" type="password" key="register-confirm-password" />
         </>
       )}
       <button className='bg-custom-button-auth w-327px h-51px gap-0 rounded-custom'>
         {variant}
       </button>
       <div className='flex gap-2'>
-        <a>{isLogin ? 'No account?' : 'Have an account?'}</a>
-        <a className='text-gradient' onClick={toggleVariant}>
+        <span>{isLogin ? 'No account?' : 'Have an account?'}</span>
+        <button className='text-gradient cursor-pointer' onClick={toggleVariant}>
           {isLogin ? 'Register Here' : 'Login Here'}
-        </a>
+        </button>
       </div>
     </div>
   );

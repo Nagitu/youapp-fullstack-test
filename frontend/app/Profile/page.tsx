@@ -5,10 +5,22 @@ import ProfileInput from "./components/ProfileInput";
 import AboutSection from "./components/AboutSection";
 import InterestSection from "./components/InterestSection";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
-const Page = () => {
+type Session = {
+    accessToken?: string; 
+    user?: {
+        id: string|'guest'
+    }
+};
+
+const Page: React.FC = () => {
     const [aboutAction, setAboutAction] = useState<'SAVE' | 'EDIT'>('EDIT');
     const [interestAction, setInterestAction] = useState<'SAVE' | 'EDIT'>('EDIT');
+    const { data: session } = useSession();
+    const token = (session as Session)?.accessToken;
+    const username = (session as Session)?.user?.id || 'Guest';
+    console.log(username);
 
     const handleActionChange = (section: 'about' | 'interest') => {
         if (section === 'about') {
@@ -18,25 +30,20 @@ const Page = () => {
         }
     };
 
-    const username = 'johndoe123';
-    const biodata = {
-        username,
-        birthday: "28 / 08 / 1995",
-        Age: 28,
-        horoscope: "virgo",
-        zodiac: "virgo",
-        height: 175,
-        weight: 65,
-        gender: "male"
-    };
-
     return (
         <div className='flex flex-col min-h-screen py-4'>
             <Header username={username} />
             <div className='flex flex-col gap-5'>
-                <ProfileInput username={username} Gender={biodata.gender}  />
-                <AboutSection action={aboutAction} onActionChange={() => handleActionChange('about')} biodata={biodata} />
-                <InterestSection action={interestAction} onActionChange={() => handleActionChange('interest')} />
+                <ProfileInput username={username} />
+                <AboutSection
+                    action={aboutAction}
+                    onActionChange={() => handleActionChange('about')}
+                    token={token} 
+                />
+                <InterestSection
+                    action={interestAction}
+                    onActionChange={() => handleActionChange('interest')}
+                />
             </div>
         </div>
     );
