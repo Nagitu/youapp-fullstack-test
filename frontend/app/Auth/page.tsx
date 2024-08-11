@@ -1,16 +1,108 @@
-'use client'
+'use client';
 
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
-import Input from "./components/Input"; // Pastikan jalur ini benar
-import BackButton from "../components/Button/BackButton"; // Pastikan jalur ini benar
+import { signIn } from 'next-auth/react';
+import Input from "./components/Input"; 
+import BackButton from "../components/Button/BackButton"; 
 
-const AuthPage = () => {
-  const [variant, setVariant] = useState('LOGIN'); 
-  const router = useRouter(); 
+type Variant = 'LOGIN' | 'REGISTER';
+
+// Tipe untuk state input
+type AuthState = {
+  identifier: string;  
+  username: string;
+  email: string;       
+  password: string;
+  confirmPassword: string;
+};
+
+const AuthPage: React.FC = () => {
+  const [variant, setVariant] = useState<Variant>('LOGIN');
+  const [authState, setAuthState] = useState<AuthState>({
+    identifier: '', 
+    username: '',
+    email: '',   
+    password: '',
+    confirmPassword: '',
+  });
+
+  const router = useRouter();
 
   const toggleVariant = () => {
-    setVariant(prevVariant => (prevVariant === 'LOGIN' ? 'REGISTER' : 'LOGIN'));
+    setVariant((prevVariant) => (prevVariant === 'LOGIN' ? 'REGISTER' : 'LOGIN'));
+  };
+
+  const handleChange = (field: keyof AuthState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAuthState({ ...authState, [field]: e.target.value });
+  };
+
+  const handleLogin = async () => {
+    console.log("Login data:", {
+      identifier: authState.identifier,
+      password: authState.password,
+    });
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        identifier: authState.identifier,
+        password: authState.password,
+      });
+
+      if (result?.error) {
+        console.error(result.error);
+      } else {
+        router.push('/home'); 
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
+
+  const handleRegister = async () => {
+    if (authState.password !== authState.confirmPassword) {
+      console.error('Passwords do not match');
+      return;
+    }
+
+    console.log("Registration data:", {
+      email: authState.email,
+      username: authState.username,
+      password: authState.password,
+      confirmPassword: authState.confirmPassword,
+    });
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: authState.email,
+          username: authState.username,
+          password: authState.password,
+        }),
+      });
+
+      if (response.ok) {
+        toggleVariant(); 
+      } else {
+        const errorData = await response.json();
+        console.error('Registration error:', errorData.message);
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (variant === 'LOGIN') {
+      handleLogin();
+    } else {
+      handleRegister();
+    }
   };
 
   const isLogin = variant === 'LOGIN';
@@ -23,18 +115,57 @@ const AuthPage = () => {
       <h1 className='text-lg'>{variant}</h1>
       {isLogin ? (
         <>
-          <Input placeholder="enter username/email" type="text" key="login-username" />
-          <Input placeholder="enter your password" type="password" key="login-password" />
+          <Input
+            placeholder="Enter username/email"
+            type="text"
+            key="login-identifier"
+            value={authState.identifier}
+            onChange={handleChange('identifier')}
+          />
+          <Input
+            placeholder="Enter your password"
+            type="password"
+            key="login-password"
+            value={authState.password}
+            onChange={handleChange('password')}
+          />
         </>
       ) : (
         <>
-          <Input placeholder="enter email" type="text" key="register-email" />
-          <Input placeholder="enter username" type="text" key="register-username" />
-          <Input placeholder="enter password" type="password" key="register-password" />
-          <Input placeholder="confirm password" type="password" key="register-confirm-password" />
+          <Input
+            placeholder="Enter email"
+            type="text"
+            key="register-email"
+            value={authState.email}
+            onChange={handleChange('email')}
+          />
+          <Input
+            placeholder="Enter username"
+            type="text"
+            key="register-username"
+            value={authState.username}
+            onChange={handleChange('username')}
+          />
+          <Input
+            placeholder="Enter password"
+            type="password"
+            key="register-password"
+            value={authState.password}
+            onChange={handleChange('password')}
+          />
+          <Input
+            placeholder="Confirm password"
+            type="password"
+            key="register-confirm-password"
+            value={authState.confirmPassword}
+            onChange={handleChange('confirmPassword')}
+          />
         </>
       )}
-      <button className='bg-custom-button-auth w-327px h-51px gap-0 rounded-custom'>
+      <button
+        className='bg-custom-button-auth w-327px h-51px gap-0 rounded-custom'
+        onClick={handleSubmit}
+      >
         {variant}
       </button>
       <div className='flex gap-2'>

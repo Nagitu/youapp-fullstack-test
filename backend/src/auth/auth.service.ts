@@ -17,10 +17,10 @@ export class AuthService {
   ) {}
 
   async signIn(LoginDto: LoginDto): Promise<{ access_token: string }> {
-    const { username, password } = LoginDto;
+    const { username,email, password } = LoginDto;
     const user = await this.userModel.findOne({ $or: [
         { username: username },
-        { email: username }
+        { email: email }
     ]})
 
     if (!user) {

@@ -5,7 +5,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Profile } from '../db/schema/profile.schema';
 import { User } from '../db/schema/user.schema';
 import { Model } from 'mongoose';
-import { getZodiacSign } from '../utils/zodiac.utils';
+import { getHoroscope} from '../utils/horoscope.utils';
+import { getZodiac } from '../utils/zodiac.utils';
+
 
 @Injectable()
 export class ProfileService {
@@ -22,7 +24,8 @@ export class ProfileService {
     if(isUSerExist){
       throw new ConflictException('this user already has a profile')
     }
-    const zodiac = birthday ? getZodiacSign(new Date(birthday)) : '';
+    const zodiac = birthday ? getZodiac(new Date(birthday)) : '';
+    const horoscope = birthday ? getHoroscope(new Date(birthday)) : '';
     const newProfile = await this.profileModel.create({
       user: userId || '',
       birthday: birthday || null, 
@@ -31,6 +34,7 @@ export class ProfileService {
       weight: weight || '',
       height: height || '',
       about: about || '',
+      horoscope
     });
 
     await this.userModel.findByIdAndUpdate(userId, { profile: newProfile._id });
@@ -56,12 +60,26 @@ export class ProfileService {
 
   async update(userId: string, updateProfileDto: UpdateProfileDto) {
     const existingUser = await this.profileModel.findOne({user:userId});
+    const {birthday, gender, weight, height ,about } = updateProfileDto;
     if (!existingUser) {
       throw new NotFoundException('User not found');
     }
+    const zodiac = birthday ? getZodiac(new Date(birthday)) : getZodiac(new Date(existingUser.birthday));
+    const horoscope = birthday ? getHoroscope(new Date(birthday)) : getHoroscope(new Date(existingUser.birthday));
+    
+    const newProfile = {
+      user: userId || '',
+      birthday: birthday || existingUser.birthday, 
+      zodiac,
+      gender: gender || existingUser.gender,
+      weight: weight || existingUser.weight,
+      height: height || existingUser.height,
+      about: about || existingUser.about,
+      horoscope
+    }
     const updatedProfile = await this.profileModel.findOneAndUpdate(
       { user: userId },
-      { $set: updateProfileDto },
+      { $set: newProfile },
       { new: true, runValidators: true }
     );
     return updatedProfile

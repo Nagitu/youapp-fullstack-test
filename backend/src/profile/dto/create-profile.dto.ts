@@ -6,6 +6,8 @@ export class CreateProfileDto {
       @ApiProperty({ example: 'male' })
       gender :string
       @ApiProperty({ example: 'sagitarius' })
+      horoscope :string
+      @ApiProperty({ example: 'rooster' })
       zodiac :string
       @ApiProperty({ example: '60' })
       weight :number

@@ -7,13 +7,14 @@ export const options: NextAuthOptions = {
       id: "credentials",
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "input your username" },
+        identifier: { label: "Username/Email", type: "text", placeholder: "Input your username or email" },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials) {
           return null;
         }
+
         try {
           const response = await fetch("http://localhost:8080/login", {
             method: "POST",
@@ -21,7 +22,8 @@ export const options: NextAuthOptions = {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              username: credentials.username,
+              username: credentials.identifier, // Mengirim nilai yang sama untuk username dan email
+              email: credentials.identifier,    // Mengirim nilai yang sama untuk username dan email
               password: credentials.password,
             }),
           });
@@ -35,7 +37,7 @@ export const options: NextAuthOptions = {
 
           if (data && data.access_token) {
             return {
-              id: credentials.username,
+              id: credentials.identifier,
               token: data.access_token,
             };
           }
@@ -55,7 +57,6 @@ export const options: NextAuthOptions = {
         token.id = user.id;
         token.accessToken = user.token;
       }
-      console.log("JWT callback - token:", token);
       return token;
     },
     async session({ session, token }: any) {
@@ -63,10 +64,8 @@ export const options: NextAuthOptions = {
         session.user.id = token.id as string;
         session.accessToken = token.accessToken as string;
       }
-      console.log("Session callback - session:", session);
       return session;
     },
-    // async redirect({baseUrl:'/' url:''})
   },
   secret: process.env.NEXTAUTH_SECRET || "your_secret",
   session: {
