@@ -10,7 +10,7 @@ export default function Home() {
       <h1 className='text-3xl font-bold mb-4 '>Welcome to You App</h1>
       <h2 className='text-xl'>The first dating app with horoscope</h2>
       {/* <Link href="/Auth" className='hover:underline text-gradient' onClick={() => signIn}>click to continue using app</Link> */}
-      <button  className='hover:underline text-gradient' onClick={() => signIn()}>click to continue using app</button>
+      <Link  className='hover:underline text-gradient' href={'/auth'}>click to continue using app</Link>
     </div>
   </div>
   
