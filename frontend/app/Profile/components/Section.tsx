@@ -17,7 +17,7 @@ const Section: React.FC<SectionProps> = ({
 }) => {
     const handleButtonClick = () => {
         if (action === 'SAVE') {
-            onSave();  // Panggil fungsi handleSaveOrUpdate di sini
+            onSave();  
         }
         onActionChange();
     };
