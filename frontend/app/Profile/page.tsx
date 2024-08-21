@@ -32,7 +32,7 @@ const Page: React.FC = () => {
     };
     return (
         <div className='flex flex-col min-h-screen py-4'>
-            <Header username={username} />
+            <Header username={username} href="/Home"/>
             <div className='flex flex-col gap-5'>
                 <ProfileInput username={username} />
                 <AboutSection

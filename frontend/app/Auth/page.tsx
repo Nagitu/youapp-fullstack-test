@@ -8,7 +8,6 @@ import BackButton from "../components/Button/BackButton";
 
 type Variant = 'LOGIN' | 'REGISTER';
 
-// Tipe untuk state input
 type AuthState = {
   identifier: string;  
   username: string;
